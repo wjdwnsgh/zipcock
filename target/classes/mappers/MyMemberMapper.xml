@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace를 통해 서비스 역할의 인터페이스와 연결한다. -->  
+<mapper namespace="mybatis.IAndroidDAO">
+
+	<select id="memberList" resultType="membership.MemberDTO">
+		SELECT * FROM member ORDER BY member_id DESC
+	</select>
+	
+	
+	<select id="memberLogin" resultType="membership.MemberDTO" 
+		parameterType="membership.MemberDTO">
+		SELECT * FROM member WHERE member_id=#{member_id} and member_pass=#{member_pass}
+	</select> 
+	
+	<select id="memberInfo" resultType="membership.MemberDTO" 
+		parameterType="membership.MemberDTO">
+		SELECT * FROM member WHERE member_id=#{member_id}
+	</select>
+	
+	<select id="delstart" resultType="mission.MissionDTO" 
+		parameterType="mission.MissionDTO">
+		SELECT * FROM mission WHERE mission_num=#{mission_num}
+	</select>
+	
+	<select id="helperLocation" resultType="mission.MissionDTO" 
+		parameterType="mission.MissionDTO">
+		SELECT * FROM mission WHERE mission_num=#{mission_num}
+	</select>
+	
+	<update id="insertLocation" parameterType="mission.MissionDTO">
+		UPDATE mission 
+		SET mission_start = #{mission_start} 
+		WHERE mission_Hid = #{mission_Hid} and mission_num = #{mission_num}
+	</update>
+	
+	<update id="complete" parameterType="mission.MissionDTO">
+		UPDATE mission 
+		SET mission_status = 3 
+		WHERE mission_num = #{mission_num}
+	</update>
+	
+	<update id="Hcomplete" parameterType="mission.MissionDTO">
+		UPDATE mission 
+		SET mission_status = 4 
+		WHERE mission_num = #{mission_num}
+	</update>
+	
+	<update id="matching" parameterType="mission.MissionDTO">
+		UPDATE mission 
+		SET mission_status = 2,
+			mission_Hid = #{mission_Hid}
+		WHERE mission_num = #{mission_num}
+	</update>
+	
+	<select resultType="membership.MemberDTO" id="ImemberDelete" parameterType="membership.MemberDTO">
+		DELETE FROM member WHERE member_id=#{member_id} 
+	</select>
+	
+	<select resultType="board.MBoardDTO" id="mboardList">
+		SELECT * FROM mboard ORDER BY mboard_date DESC 
+	</select>
+
+	<select resultType="board.MBoardDTO" id="mboardView" parameterType="board.MBoardDTO">
+		SELECT * FROM mboard WHERE mboard_num=#{mboard_num} 
+	</select>
+	
+	<select id="missionList" resultType="mission.MissionDTO">
+		SELECT * FROM mission ORDER BY mission_num DESC 
+	</select>
+
+	<select id="missionView" resultType="mission.MissionDTO">
+		SELECT * FROM mission WHERE mission_num = #{mission_num}
+	</select>
+
+	<select id="missionListSearch" resultType="mission.MissionDTO" parameterType="mission.ParameterDTO">
+		SELECT * FROM mission
+			<if test="searchTxt!=null and !searchTxt.equals('')">
+				WHERE mission_name like '%'||#{searchTxt}||'%'
+			</if>
+			ORDER BY mission_num DESC
+	</select>
+	
+	<select id="chatList" resultType="mission.MissionDTO">
+		SELECT * FROM mission WHERE (mission_id = #{mission_id} OR mission_Hid = #{mission_Hid}) AND (mission_status='2' or mission_status='4')
+	</select>
+	
+	<select id="reviewList" resultType="mybatis.ParameterDTO" >
+		 SELECT * FROM review WHERE review_id=#{review_id} ORDER BY review_num DESC
+	</select>
+	
+	<update id="Reviewmodify" parameterType="mybatis.ParameterDTO">
+		UPDATE review 
+			SET review_content=#{review_content}, review_point=#{review_point}
+			WHERE review_num=#{review_num}
+	</update>
+	
+	<select id="Reviewdelete">
+		DELETE FROM review WHERE review_num=#{review_num} AND review_id=#{review_id}
+	</select>	
+	
+	<update id="memberInfoEdit" parameterType="membership.MemberDTO">
+      UPDATE member
+         SET member_pass=#{member_pass}, member_email=#{member_email}
+            , member_age=#{member_age}, member_phone=#{member_phone}, member_name=#{member_name}
+         WHERE member_id=#{member_id}
+   </update>
+   
+    <update id="hmemberInfoEdit" parameterType="membership.MemberDTO">
+      UPDATE member
+         SET member_pass=#{member_pass}, member_email=#{member_email}
+            , member_age=#{member_age}, member_phone=#{member_phone}, member_name=#{member_name}, member_bank=#{member_bank}, member_account=#{member_account}, member_introduce=#{member_introduce}
+         WHERE member_id=#{member_id}
+   </update>
+
+	<select id="idCheck" resultType="membership.MemberDTO">
+        SELECT member_id FROM member
+            where member_id=#{member_id}
+    </select>
+    
+    <insert id="cMemberJoin">
+        INSERT INTO member (member_id, member_pass, member_name, member_email,
+                member_age, member_sex, member_phone, member_status)
+            VALUES (#{member_id}, #{member_pass}, #{member_name}, #{member_email}, 
+                        #{member_age}, #{member_sex}, #{member_phone}, #{member_status})
+    </insert>
+    
+    <insert id="memberJoin">
+        INSERT INTO member (member_status, member_id, member_pass, member_name, member_email,
+                member_age, member_sex, member_phone, 
+                member_bank, member_account, member_vehicle,
+                member_introduce
+                <if test="member_ofile != null and member_sfile !=null">
+                , member_ofile, member_sfile
+                </if>
+                )
+                
+            VALUES (#{member_status}, #{member_id}, #{member_pass}, #{member_name}, #{member_email}, 
+                        #{member_age}, #{member_sex}, #{member_phone}, 
+                        #{member_bank}, #{member_account}, #{member_vehicle},
+                        #{member_introduce}
+                        <if test="member_ofile != null and member_sfile !=null">
+                         , #{member_ofile}, #{member_sfile}
+                        </if>
+                         )
+    </insert>
+    
+    <select id="findId" resultType="membership.MemberDTO"
+		parameterType="membership.MemberDTO">
+		SELECT * FROM member WHERE member_name=#{member_name} and member_email=#{member_email}
+		</select>
+
+	<select id="findPass" resultType="membership.MemberDTO"
+		parameterType="membership.MemberDTO">
+		SELECT * FROM member WHERE member_id=#{member_id} and member_email=#{member_email} and member_name=#{member_name}
+	</select>
+
+	 <insert id="missionRegist">
+      INSERT INTO mission (mission_num, mission_id, mission_category, mission_name, mission_content, mission_sex,
+            mission_end, mission_mission, mission_time, mission_cost, mission_reservation
+            
+            <if test="mission_ofile != null and mission_sfile !=null">
+            , mission_ofile, mission_sfile
+            </if>
+            <if test="mission_waypoint != null">
+                    , mission_waypoint
+            </if>
+        
+            )
+            
+         VALUES (mission_seq.nextval, #{mission_id}, #{mission_category}, #{mission_name}, #{mission_content}, #{mission_sex}, 
+                  #{mission_end}, #{mission_mission},#{mission_time}, #{mission_cost}, #{mission_reservation}
+            
+                  <if test="mission_ofile != null and mission_sfile !=null">
+                   , #{mission_ofile}, #{mission_sfile}
+                  </if>
+                  <if test="mission_waypoint != null">
+                    , #{mission_waypoint}
+                  </if>
+               
+                   )
+   	</insert>
+   		
+   	<select id="simList" resultType="mission.MissionDTO"> <!-- 추가 -->
+		SELECT * FROM mission WHERE mission_id=#{mission_id} and (mission_status = 2 or mission_status = 4)  ORDER BY mission_num DESC 
+	</select>
+	
+	   	<select id="HsimList" resultType="mission.MissionDTO"> <!-- 추가 -->
+		SELECT * FROM mission WHERE mission_Hid=#{mission_Hid} and (mission_status = 2 or mission_status = 4) ORDER BY mission_num DESC 
+	</select>
+	
+
+
+</mapper>
+
+
+
